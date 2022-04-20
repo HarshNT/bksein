@@ -2,41 +2,22 @@
 const nodemailer = require("nodemailer");
 const jadeCompiler = require('./jadeCompiler');
 const { createInvoice } = require("./createInvoice");
-var log4js = require("log4js");
-log4js.configure({
-    appenders: {
-        cheese: {
-            type: "file",
-            filename: "cheese.log"
-        }
-    },
-    categories: {
-        default: {
-            appenders: ["cheese"],
-            level: "debug"
-        }
-    }
-});
-
-const logger = log4js.getLogger("cheessse");
 
 let harsh = {};
-harsh.sendemail = (name, email, phone, age, speciality, district,state, uname, time, amount, refid) => {
+harsh.sendemail = (name, email, phone, age, speciality, district, uname, time, amount, refid) => {
 
-
+  console.log("make email"+name+email);
   return new Promise((resolve, reject) => {
 
     const invoice = {
       shipping: {
         name: name,
         email: email,
-        phone: phone,
-        district: district,
-        state: state
+        phone: phone
       },
       items: [
         {
-          description: "Registration Fee for "+getTournamentName(state),
+          description: "Registration Fees for GSPL",
           amount: amount
         }
       ],
@@ -62,14 +43,12 @@ harsh.sendemail = (name, email, phone, age, speciality, district,state, uname, t
         "age": age,
         "speciality": speciality,
         "district": district,
-        "state": state,
         "uname": uname,
         "date": time,
         "amount": amount
       };
       jadeCompiler.compile("/email", data, function (err, content) {
         if (err) {
-            logger.debug(" email"+err);
           reject(false);
           // throw new Error('Problem compiling template(double check relative path): ' + RELATIVE_TEMPLATE_PATH);
           
@@ -89,11 +68,9 @@ harsh.sendemail = (name, email, phone, age, speciality, district,state, uname, t
         // send mail with defined transport object
         transporter.sendMail(mailoption, function (error, info) {
           if (error) {
-                logger.debug(" email"+error);
             console.log(error);
             reject(false);
           }
-          logger.debug(" email info"+info);
           console.log(info);
           resolve(true);
         });
@@ -102,30 +79,7 @@ harsh.sendemail = (name, email, phone, age, speciality, district,state, uname, t
   }
   )
 };
-    function getTournamentName(state){
-        
-        switch(state){
-            case "Gujarat":
-                return "GSPL"
-                break;
-                case "MadhyaPradesh":
-                return "MPSPL"
-                break;
-                case "Maharashtra":
-                return "MSPL"
-                break;
-                case "Punjab":
-                return "PSPL"
-                break;
-                case "Rajasthan":
-                return "RSPL"
-                break;
-                case "UttarPradesh":
-                return "UPSPL"
-                break;
-        }
-        
-    }
+
 
 
 module.exports = harsh;

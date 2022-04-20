@@ -1,8 +1,5 @@
 const { response } = require('express');
 var mysql = require('mysql');
-var log4js = require("log4js");
-var logger = log4js.getLogger();
-logger.level = "debug";
 
 // var config = {
 //   host: "sql458.main-hosting.eu",
@@ -17,28 +14,28 @@ const pool = mysql.createPool({
   connectTimeout: 60 * 60 * 1000,
   acquireTimeout: 60 * 60 * 1000,
   timeout: 60 * 60 * 1000,
-  host: "localhost",
+  host: "134.119.190.82",
   user: "bksein_admin",
   password: "96arsh@mysql",
   database: "bksein_User"
 });
 
 let harsh = {};
-harsh.saveuserdata = (name, email, phone, age, speciality, district, uname,receipt,state) => {
+harsh.saveuserdata = (name, email, phone, age, speciality, district, uname,receipt) => {
 
-  // logger.debug("MY Database" + name + ":" + email + ":" + phone + ":" + age + ":" + speciality + ":" + district + ":" + uname + ":" + payment_id + ":" + order_id + ":" + signature + ":" + time);
+  // console.log("MY Database" + name + ":" + email + ":" + phone + ":" + age + ":" + speciality + ":" + district + ":" + uname + ":" + payment_id + ":" + order_id + ":" + signature + ":" + time);
 
 
   return new Promise((resolve, reject) => {
 
-    var sql = "INSERT INTO User (name,email,phone,age,speciality,district,uname,order_id,state) VALUES ('" + name + "','" + email + "', '" + phone + "', '" + age + "', '" + speciality + "', '" + district + "', '" + uname + "', '" + receipt + "', '" + state + "')";
+    var sql = "INSERT INTO User (name,email,phone,age,speciality,district,uname,order_id) VALUES ('" + name + "','" + email + "', '" + phone + "', '" + age + "', '" + speciality + "', '" + district + "', '" + uname + "', '" + receipt + "')";
     pool.query(sql, (err, results) => {
 
       if (err) {
-        logger.debug(err);
+        console.log(err);
         reject(false);
       }
-      logger.debug(results);
+      console.log(results);
       resolve(true);
 
     })
@@ -48,22 +45,22 @@ harsh.saveuserdata = (name, email, phone, age, speciality, district, uname,recei
 
 };
 
-harsh.paymentdata = ( payment_id, orderid, signature, time,mphone) => {
+harsh.paymentdata = ( payment_id, order_id, signature, time) => {
 
-
+  console.log("MY Database"  + payment_id + ":" + order_id + ":" + signature + ":" + time);
 
 
   return new Promise((resolve, reject) => {
     
-    var sql = 'UPDATE User SET payment_id = "'+payment_id+'", signature = "'+signature+'", time = "'+time+'", order_id = "'+orderid+'" WHERE phone = "'+mphone+'"';
+    var sql = 'UPDATE User SET payment_id = "'+payment_id+'", signature = "'+signature+'", time = "'+time+'" WHERE order_id = "'+order_id+'"';
     // var sql = "INSERT INTO User (payment_id,order_id,signature,time) VALUES ('" + payment_id + "', '" + order_id + "', '" + signature + "', '" + time + "')";
     pool.query(sql, (err, results) => {
 
       if (err) {
-        logger.debug("VIP ::"+err);
+        console.log("VIP ::"+err);
         reject(false);
       }
-      logger.debug(results);
+      console.log(results);
       resolve(true);
 
     })
@@ -98,7 +95,6 @@ harsh.saveemail = (isemailsent,mphone) => {
 
 };
 
-
 harsh.checkuser = (phone) => {
 
   return new Promise((resolve, reject) => {
@@ -106,14 +102,14 @@ harsh.checkuser = (phone) => {
     pool.query(sql, (err, results) => {
 
       if (err) {
-        logger.debug("merror" + err);
+        console.log("merror" + err);
         return reject(err);
       }
       if (JSON.stringify(results) == "[]") {
-        logger.debug("my harsh 2"+results);
+        console.log("my harsh 2"+results);
         return resolve("no user");
       } else {
-        logger.debug("my harsh 1"+results[0]);
+        console.log("my harsh 1"+results[0]);
         return resolve(["Already exist",results[0]]);
       }
 
@@ -130,19 +126,18 @@ harsh.checkuser = (phone) => {
 harsh.getuserdata = (orderid) => {
 
   return new Promise((resolve, reject) => {
-    var sql = "SELECT * FROM User WHERE phone='" + orderid + "'";
+    var sql = "SELECT * FROM User WHERE order_id='" + orderid + "'";
     pool.query(sql, (err, results) => {
 
       if (err) {
-        logger.debug("merror" + err);
+        console.log("merror" + err);
         return reject(err);
       }
       if (JSON.stringify(results) == "[]") {
-        logger.debug("MyFeeError"+JSON.stringify(results));
+        console.log("MyFeeError"+JSON.stringify(results));
         return resolve("no user");
       } else {
-          
-        logger.debug("MyFee Result"+JSON.stringify(results));
+        console.log("MyFee Result"+JSON.stringify(results));
         return resolve(["Already exist",results[0]]);
       }
 
@@ -156,7 +151,7 @@ harsh.getuserdata = (orderid) => {
 
 };
 
-harsh.alll = () => {
+harsh.all = () => {
   return new Promise((resolve, reject) => {
     
     var sql = "SELECT * FROM User";
@@ -165,9 +160,9 @@ harsh.alll = () => {
       if (err) {
         return reject(err);
       }
-      // logger.debug("all"+results);
+      // console.log("all"+results);
       // results.forEach((col) => {
-      //   logger.debug(col.data);
+      //   console.log(col.data);
       //   fainaldata.push(col.data);
       // });
       return resolve(results);
@@ -187,9 +182,9 @@ harsh.search = (phone) => {
       if (err) {
         return reject(err);
       }
-      // logger.debug("all"+results);
+      // console.log("all"+results);
       // results.forEach((col) => {
-      //   logger.debug(col.data);
+      //   console.log(col.data);
       //   fainaldata.push(col.data);
       // });
       return resolve(results);
@@ -200,6 +195,58 @@ harsh.search = (phone) => {
 
 };
 
+harsh.delete = (key) => {
+  var substring = key.substring(1, key.length - 1)
+  return new Promise((resolve, reject) => {
+
+
+    var fainaldata = substring.split(",");
+    console.log("allkey" + fainaldata[0]);
+    var sql = 'DELETE FROM chat WHERE msgkey IN (' + substring + ')';
+    pool.query(sql, fainaldata, (err, results) => {
+
+      if (err) {
+        return reject(err);
+      }
+      console.log("alldeleted" + results);
+      // results.forEach((col) => {
+      //   console.log(col.data);
+      //   fainaldata.push(col.data);
+      // });
+
+      return resolve(results);
+
+    })
+
+  });
+
+};
+
+harsh.update = (key, date) => {
+  var substring = key.substring(1, key.length - 1)
+  return new Promise((resolve, reject) => {
+
+    var fainaldata = substring.split(",");
+    console.log("allkey" + fainaldata[0]);
+    var sql = 'UPDATE chat SET dtime=""' + date + '" WHERE msgkey IN (' + substring + ')';
+    pool.query(sql, fainaldata, (err, results) => {
+
+      if (err) {
+        return reject(err);
+      }
+      console.log("alldeleted" + results);
+      // results.forEach((col) => {
+      //   console.log(col.data);
+      //   fainaldata.push(col.data);
+      // });
+
+      return resolve(results);
+
+    })
+
+  });
+
+};
 
 module.exports = harsh;
 
@@ -209,7 +256,7 @@ module.exports = harsh;
 
 // connection.query('SELECT 1 + 1 AS solution', function (error, results, fields) {
 //   if (error) throw error;
-//   logger.debug('The solution is: ', results[0].solution);
+//   console.log('The solution is: ', results[0].solution);
 // });
 
 

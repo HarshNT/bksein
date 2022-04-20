@@ -35,7 +35,7 @@ async function getall() {
   // var username = form[orderid].name.substring(0, 3) + form[orderid].phone;
 
   try {
-    let results = await db.alll();
+    let results = await db.all();
     console.log(results);
    
       

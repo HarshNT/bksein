@@ -68,11 +68,14 @@ function generateCustomerInformation(doc, invoice) {
     .text(invoice.shipping.name, 300, customerInformationTop)
     .font("Helvetica")
     .text(invoice.shipping.email, 300, customerInformationTop + 15)
-    .text(invoice.shipping.phone,300,  customerInformationTop + 30)
-    .text(invoice.shipping.district+", "+invoice.shipping.state,300,  customerInformationTop + 45)
+    .text(
+      invoice.shipping.phone,
+      300,
+      customerInformationTop + 30
+    )
     .moveDown();
 
-  generateHr(doc, 268);
+  generateHr(doc, 252);
 }
 
 function generateInvoiceTable(doc, invoice) {
